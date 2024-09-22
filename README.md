@@ -9,6 +9,10 @@
 
 ## Contoh Alamat by API
 
+### Fork Local API
+
+[https://blog.tan.my.id/api-wilayah-indonesia/](https://blog.tan.my.id/api-wilayah-indonesia/)
+
 ### Send value as name
 
 ```sh
@@ -98,4 +102,88 @@
 </script>
 ```
 
-[https://blog.tan.my.id/api-wilayah-indonesia/][https://blog.tan.my.id/api-wilayah-indonesia/]
+### Send value as id
+
+```sh
+<script>
+    $(document).ready(function() {
+            $('#provinsi').select2({
+                placeholder: 'Pilih Provinsi',
+                allowClear: true
+            });
+            $('#kabupaten').select2({
+                placeholder: 'Pilih Kabupaten',
+                allowClear: true
+            });
+            $('#kecamatan').select2({
+                placeholder: 'Pilih Kecamatan',
+                allowClear: true
+            });
+            $('#desa').select2({
+                placeholder: 'Pilih Desa',
+                allowClear: true
+            });
+        });
+    document.addEventListener('DOMContentLoaded', function() {
+        // Fetch Provinces
+        fetch(`https://blog.tan.my.id/api-wilayah-indonesia/api/provinces.json`)
+            .then(response => response.json())
+            .then(provinces => {
+                const provinsi = document.getElementById('provinsi');
+                provinsi.innerHTML = '<option></option>';
+                for (const province of provinces) {
+                    provinsi.innerHTML += `<option value="${province.id}">${province.name}</option>`;
+                }
+            });
+
+        // On Change Provinsi
+        $(document).on('change', '#provinsi', function() {
+            const provinsi = $(this).val();
+            const kabupaten = document.getElementById('kabupaten');
+            kabupaten.innerHTML = '<option></option>'; // Default option
+            fetch(`https://blog.tan.my.id/api-wilayah-indonesia/api/regencies/${provinsi}.json`)
+                .then(response => response.json())
+                .then(regencies => {
+                    for (const regency of regencies) {
+                        kabupaten.innerHTML += `<option value="${regency.id}">${regency.name}</option>`;
+                    }
+                });
+
+            // Reset kecamatan and desa on provinsi change
+            document.getElementById('kecamatan').innerHTML = '<option></option>';
+            document.getElementById('desa').innerHTML = '<option></option>';
+        });
+
+        // On Change Kabupaten
+        $(document).on('change', '#kabupaten', function() {
+            const kabupaten = $(this).val();
+            const kecamatan = document.getElementById('kecamatan');
+            kecamatan.innerHTML = '<option></option>'; // Default option
+            fetch(`https://blog.tan.my.id/api-wilayah-indonesia/api/districts/${kabupaten}.json`)
+                .then(response => response.json())
+                .then(districts => {
+                    for (const district of districts) {
+                        kecamatan.innerHTML += `<option value="${district.id}">${district.name}</option>`;
+                    }
+                });
+
+            // Reset desa on kabupaten change
+            document.getElementById('desa').innerHTML = '<option></option>';
+        });
+
+        // On Change Kecamatan
+        $(document).on('change', '#kecamatan', function() {
+            const kecamatan = $(this).val();
+            const desa = document.getElementById('desa');
+            desa.innerHTML = '<option></option>'; // Default option
+            fetch(`https://blog.tan.my.id/api-wilayah-indonesia/api/villages/${kecamatan}.json`)
+                .then(response => response.json())
+                .then(villages => {
+                    for (const village of villages) {
+                        desa.innerHTML += `<option value="${village.id}">${village.name}</option>`;
+                    }
+                });
+        });
+    });
+</script>
+```
