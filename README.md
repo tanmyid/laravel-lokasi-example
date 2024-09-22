@@ -7,60 +7,95 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
-## About Laravel
+## Contoh Alamat by API
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+### Send value as name
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+```sh
+<script>
+    $(document).ready(function() {
+        $('#provinsi').select2({
+            placeholder: 'Pilih Provinsi',
+            allowClear: true
+        });
+        $('#kabupaten').select2({
+            placeholder: 'Pilih Kabupaten',
+            allowClear: true
+        });
+        $('#kecamatan').select2({
+            placeholder: 'Pilih Kecamatan',
+            allowClear: true
+        });
+        $('#desa').select2({
+            placeholder: 'Pilih Desa',
+            allowClear: true
+        });
+    });
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+    // Send value as name
+    document.addEventListener('DOMContentLoaded', function() {
+        // Fetch API Data
+        fetch(`https://blog.tan.my.id/api-wilayah-indonesia/api/provinces.json`)
+            .then(response => response.json())
+            .then(provinces => {
+                const provinsi = document.getElementsByName('provinsi')[0];
+                provinsi.innerHTML = '<option></option>';
+                for (const province of provinces) {
+                    provinsi.innerHTML += `<option value="${province.name}" data-id="${province.id}">${province.name}</option>`;
+                }
+            });
 
-## Learning Laravel
+        $(document).on('change', '[name="provinsi"]', function() {
+            const selectedOption = $(this).find('option:selected');
+            const provinsiId = selectedOption.data('id');
+            const kabupaten = document.getElementsByName('kabupaten')[0];
+            kabupaten.innerHTML = '<option></option>';
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+            fetch(`https://blog.tan.my.id/api-wilayah-indonesia/api/regencies/${provinsiId}.json`)
+                .then(response => response.json())
+                .then(regencies => {
+                    for (const regency of regencies) {
+                        kabupaten.innerHTML += `<option value="${regency.name}" data-id="${regency.id}">${regency.name}</option>`;
+                    }
+                });
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+            document.getElementsByName('kecamatan')[0].innerHTML = '<option></option>';
+            document.getElementsByName('desa')[0].innerHTML = '<option></option>';
+        });
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+        $(document).on('change', '[name="kabupaten"]', function() {
+            const selectedOption = $(this).find('option:selected');
+            const kabupatenId = selectedOption.data('id');
+            const kecamatan = document.getElementsByName('kecamatan')[0];
+            kecamatan.innerHTML = '<option></option>';
 
-## Laravel Sponsors
+            fetch(`https://blog.tan.my.id/api-wilayah-indonesia/api/districts/${kabupatenId}.json`)
+                .then(response => response.json())
+                .then(districts => {
+                    for (const district of districts) {
+                        kecamatan.innerHTML += `<option value="${district.name}" data-id="${district.id}">${district.name}</option>`;
+                    }
+                });
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+            document.getElementsByName('desa')[0].innerHTML = '<option></option>';
+        });
 
-### Premium Partners
+        $(document).on('change', '[name="kecamatan"]', function() {
+            const selectedOption = $(this).find('option:selected');
+            const kecamatanId = selectedOption.data('id');
+            const desa = document.getElementsByName('desa')[0];
+            desa.innerHTML = '<option></option>';
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+            fetch(`https://blog.tan.my.id/api-wilayah-indonesia/api/villages/${kecamatanId}.json`)
+                .then(response => response.json())
+                .then(villages => {
+                    for (const village of villages) {
+                        desa.innerHTML += `<option value="${village.name}" data-id="${village.id}">${village.name}</option>`;
+                    }
+                });
+        });
+    });
+</script>
+```
 
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+[https://blog.tan.my.id/api-wilayah-indonesia/][https://blog.tan.my.id/api-wilayah-indonesia/]
